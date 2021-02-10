@@ -117,8 +117,8 @@ contract BaseCanary is EIP801 {
 /// @notice Can be deployed by an EOA or another contract.  Only one contract
 ///         needs to feed this one.
 contract SingleFeederCanary is BaseCanary {
-    /// @notice The owner is the feeder, but with minimal modifications to
-    ///         the constructor, anyone could be.
+    // The owner is the feeder, but with minimal modifications to
+    //         the constructor, anyone could be.
     address private _feeder;
     
     constructor(uint256 feedingIntervalInSeconds) {
@@ -196,7 +196,7 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
 
     constructor(address[] memory feeders,
                 uint256 feedingIntervalInSeconds) {
-        require(feeders.length > 1, "Need at least two feeders.")
+        require(feeders.length > 1, "Need at least two feeders.");
         
         _feeders = new address[](feeders.length);
         
