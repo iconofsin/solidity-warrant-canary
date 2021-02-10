@@ -27,13 +27,28 @@ interface EIP801 {
     }
 
     /// @notice Determines whether the canary was fed properly to signal e.g. that no warrant
-    ///         was received. EIP-801 name: isAlive.
-    function isCanaryAlive() external returns (bool);
+    ///         was received. EIP-801 name: isAlive. Note that this could misrepresent
+    ///         the canary's health. touchCanary to be sure.
+    function isCanaryAlive() external view returns (bool);
     
     /// @notice Returns the type of the canary. EIP-801 name: getType
-    function getCanaryType() external returns (CanaryType);
+    function getCanaryType() external pure returns (CanaryType);
 
-    /// @notice Returns the block when the canary died. 0 if alive. THIS IS A CHANGE FROM
+    /// @notice Returns the block when the canary died. 0 otherwise. THIS IS A CHANGE FROM
     ///         EIP-801, because we can no longer throw in Solidity. EIP-801 name: getBlockOfDeath.
-    function getCanaryBlockOfDeath() external returns (uint256);
+    ///         Note that this could misrepresent the canary's health.  touchCanary to be sure.
+    function getCanaryBlockOfDeath() external view returns (uint256);
+
+
+    // The following function can be used to track the canary without paying any gas.
+    // It will not automatically pronounce the canary dead, for instance, if it hasn't been fed
+    // on time. As such, it's not a reliable indicator.
+
+    /// @notice Returns true if canary is alive, false otherwise. Unlike isCanaryAlive,
+    ///         getCanaryType, and getCanaryBlockOfDeath, guards against misrepresenting
+    ///         the canary's health by verifying that it has been both fed and not
+    ///         intentionally poisoned. Consequently, touchCanary is a _transaction_, while
+    ///         the above are _calls_. 
+    function touchCanary() external returns (bool);
 }
+

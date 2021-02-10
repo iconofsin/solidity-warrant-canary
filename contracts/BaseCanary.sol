@@ -53,8 +53,8 @@ contract BaseCanary is EIP801 {
     ///         from hunger.
     /// @return A positive number of seconds if there's still time to feed
     ///         the canary, a negative number otherwise.
-    function timeRemaining() external view onlyFeeders returns (uint256) {
-        return _feedingInterval - (block.timestamp - _timeLastFed);
+    function timeRemaining() external view onlyFeeders returns (int256) {
+        return int256(_feedingInterval - (block.timestamp - _timeLastFed));
     }
 
     /// @notice Feeds the canary. This must only be accessible to feeder(s).
@@ -74,24 +74,25 @@ contract BaseCanary is EIP801 {
     // functions for consumption by anyone
     //
     /// @inheritdoc EIP801
-    function isCanaryAlive() external override returns (bool) {
-        _autokillGuard();
-        
+    function isCanaryAlive() external view override returns (bool) {
         return !_deathRegistered();
     }
 
     /// @inheritdoc EIP801
-    function getCanaryType() external override returns (CanaryType) {
-        _autokillGuard();
-                
+    function getCanaryType() external pure override returns (CanaryType) {
         return _canaryType;
     }
     
 
     /// @inheritdoc EIP801
-    function getCanaryBlockOfDeath() external override returns (uint256) {
-        _autokillGuard();
-        
+    function getCanaryBlockOfDeath() external view override returns (uint256) {        
         return _blockOfDeath;
+    }
+
+    /// @inheritdoc EIP801
+    function touchCanary() external override returns (bool) {
+        _autokillGuard();
+
+        return !_deathRegistered();
     }
 }
