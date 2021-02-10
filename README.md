@@ -2,7 +2,7 @@
 
 untested code, do not use
 
-* Interface EIP
+* EIP801 interface
 * BaseCanary
 * SingleFeederCanary
 * MultipleFeedersCanary
