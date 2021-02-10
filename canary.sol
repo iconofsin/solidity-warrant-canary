@@ -56,7 +56,7 @@ contract BaseCanary is EIP801 {
         return _timeLastFed + _feedingInterval < block.timestamp;
     }
 
-    function feed() external onlyFeeders {
+    function feed() external virtual onlyFeeders {
         // are you on time to feed the canary?
         if (_feedingSkipped()) {
             // you're too late, perhaps on purpose
@@ -133,7 +133,7 @@ contract MultipleFeedersCanary is BaseCanary {
     }
 
 
-     modifier onlyFeeders override {
+    modifier onlyFeeders override {
         require(_feeders[msg.sender] == 1, "You're not a feeder.");
 
         _;
@@ -144,4 +144,61 @@ contract MultipleFeedersCanary is BaseCanary {
         
         return CanaryType.MultipleFeeders;
     }
+}
+
+
+contract MultipleMandatoryFeeders is BaseCanary {
+    address[] _feeders;
+    mapping(address => uint256) _feedingLog;
+
+    constructor(address[] memory feeders,
+                uint256 feedingIntervalInSeconds) {
+        
+        _feeders = new address[](feeders.length);
+        
+        _timeLastFed = block.timestamp;
+
+        for (uint256 f = 0; f < feeders.length; f++) {
+            _feedingLog[feeders[f]] = _timeLastFed;
+            _feeders.push(feeders[f]);
+        }
+
+        _feedingInterval = feedingIntervalInSeconds;
+    }
+
+    modifier onlyFeeders override {
+        require(_feedingLog[msg.sender] > 0, "You're not a feeder.");
+        
+        _;
+    }
+    
+    function feed() external override onlyFeeders {
+        // are you on time to feed the canary?
+        if (_feedingSkipped()) {
+            // you're too late, perhaps on purpose
+            _rip();
+        } else {
+            _feedingLog[msg.sender] = block.timestamp;
+
+            bool everyoneHasFedTheCanary = true;
+            
+            for (uint256 f = 0; f < _feeders.length; f++) {
+                everyoneHasFedTheCanary =
+                    everyoneHasFedTheCanary &&
+                    (_timeLastFed + _feedingInterval
+                     <=
+                     _feedingLog[_feeders[f]]);
+            }
+
+            if (everyoneHasFedTheCanary)
+                _timeLastFed = block.timestamp;
+        }
+    }
+
+    function getType() external override returns (CanaryType) {
+        if (_feedingSkipped()) _rip();
+        
+        return CanaryType.MultipleMandatoryFeeders;
+    }
+    
 }
