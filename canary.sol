@@ -3,12 +3,14 @@ pragma solidity ^0.8.1;
 
 /// @title An implementation of the draft interface from EIP-801.
 /// @notice Introduces minor changes compared EIP-801 [https://eips.ethereum.org/EIPS/eip-801]
+///         Methods have been renamed to avoid potential conflicts with other intefaces
+///         and contract methods and to increase clarity.
 interface EIP801 {
     /// @notice Triggered when the contract is called for the first time after the canary died.
-    ///         NOTE: EIP-801 had no arguments.         
+    ///         NOTE: EIP-801 had no arguments and named this simply RIP.         
     /// @param block The block when the canary died.
     /// @param time The time when the canary died.
-    event RIP(uint256 block, uint256 time);
+    event RIPCanary(uint256 block, uint256 time);
 
     /// @notice Types of canaries. Per EIP-801. Unfortunately, EIP-801 does not explain
     ///         what either SingleFeederBadFood or IOT do. 
@@ -25,15 +27,15 @@ interface EIP801 {
     }
 
     /// @notice Determines whether the canary was fed properly to signal e.g. that no warrant
-    ///         was received.
-    function isAlive() external returns (bool);
+    ///         was received. EIP-801 name: isAlive.
+    function isCanaryAlive() external returns (bool);
     
-    /// @notice Returns the type of the canary
-    function getType() external returns (CanaryType);
+    /// @notice Returns the type of the canary. EIP-801 name: getType
+    function getCanaryType() external returns (CanaryType);
 
     /// @notice Returns the block when the canary died. 0 if alive. THIS IS A CHANGE FROM
-    ///         EIP-801, because we can no longer throw in Solidity.
-    function getBlockOfDeath() external returns (uint256);
+    ///         EIP-801, because we can no longer throw in Solidity. EIP-801 name: getBlockOfDeath.
+    function getCanaryBlockOfDeath() external returns (uint256);
 }
 
 /// @notice Implements basic canary logic. Never use this directly. 
@@ -50,23 +52,21 @@ contract BaseCanary is EIP801 {
 
     /// @notice Checks if the canary's time of death has been called by recording
     ///         the block when it died.  The default, block 0, means the canary
-    ///         is considered alive.
+    ///         is considered alive. "Death registered" always implies RIP has
+    ///         been emitted.
     /// @return True if the canary is alive, false otherwise.
-    function _deathRegistered() private view returns (bool) {
+    function _deathRegistered() internal view returns (bool) {
         return _blockOfDeath > 0;
     }
 
-    /// @notice Marks the canary as dead, records the death block and emits RIP(...)
-    function _kill() private {
-        _blockOfDeath = block.number;
-        
-        emit RIP(_blockOfDeath, block.timestamp);
-    }
-
-    /// @notice Wrapper around _kill that prevents anyone from killing a canary
-    ///         that's already dead.
+    /// @notice If the canary is alive, kills it, records the death block, and emits RIP(...)
     function _rip() internal {
-        if (!_deathRegistered()) _kill();
+        // don't kill the bird twice
+        if (_deathRegistered()) return;
+
+        _blockOfDeath = block.number;
+
+        emit RIPCanary(_blockOfDeath, block.timestamp);
     }
 
     /// @notice Determines if the canary must die of hunger right now.
@@ -75,17 +75,7 @@ contract BaseCanary is EIP801 {
         return _timeLastFed + _feedingInterval < block.timestamp;
     }
 
-    /// @notice Feeds the canary. This must only be accessible to feeder(s).
-    /// @dev Override and implement in a derived class.
-    function feed() external virtual onlyFeeders {}
-    
-    
-    /// @notice Instantly kills the canary if alive.
-    function poison() external onlyFeeders {
-        _rip();
-    }
-
-    /// @notice Determines the time remaining before the canary dies
+     /// @notice Determines the time remaining before the canary dies
     ///         from hunger.
     /// @return A positive number of seconds if there's still time to feed
     ///         the canary, a negative number otherwise.
@@ -93,22 +83,41 @@ contract BaseCanary is EIP801 {
         return _feedingInterval - (block.timestamp - _timeLastFed);
     }
 
+    /// @notice Feeds the canary. This must only be accessible to feeder(s).
+    /// @dev Override and implement in a derived class.
+    function feed() external virtual onlyFeeders {}
+    
+    
+    /// @notice Instantly kills the canary if alive.
+    ///         Note that any one feeder can poison the canary for all types.
+    ///         Override this method if you need a different behaviour.
+    function poison() external virtual onlyFeeders {
+        _rip();
+    }
+
+   
     //
     // functions for consumption by anyone
     //
     /// @inheritdoc EIP801
-    function isAlive() external override returns (bool) {
-        if (_feedingSkipped()) _rip();
-      
+    function isCanaryAlive() external override returns (bool) {
+        bool alive = !_deathRegistered();
+
+        // autokill guard
+        if (alive && _feedingSkipped()) _rip();
+
         return !_deathRegistered();
     }
 
     /// @inheritdoc EIP801
-    function getType() external override virtual returns (CanaryType) {}
+    function getCanaryType() external override virtual returns (CanaryType) {}
 
     /// @inheritdoc EIP801
-    function getBlockOfDeath() external override returns (uint256) {
-        if (_feedingSkipped()) _rip();
+    function getCanaryBlockOfDeath() external override returns (uint256) {
+        bool alive = !_deathRegistered();
+
+        // autokill guard
+        if (alive && _feedingSkipped()) _rip();
         
         return _blockOfDeath;
     }
@@ -148,8 +157,11 @@ contract SingleFeederCanary is BaseCanary {
     }
 
     /// @inheritdoc EIP801
-    function getType() external override returns (CanaryType) {
-        if (_feedingSkipped()) _rip();
+    function getCanaryType() external override returns (CanaryType) {
+        bool alive = !_deathRegistered();
+
+        // autokill guard
+        if (alive && _feedingSkipped()) _rip();
         
         return CanaryType.SingleFeeder;
     }
@@ -176,13 +188,16 @@ contract MultipleFeedersCanary is BaseCanary {
     /// @inheritdoc BaseCanary
     modifier onlyFeeders override {
         require(_feeders[msg.sender] == 1, "You're not a feeder.");
-
+        
         _;
     }
-
+    
     /// @inheritdoc EIP801
-     function getType() external override returns (CanaryType) {
-        if (_feedingSkipped()) _rip();
+    function getCanaryType() external override returns (CanaryType) {
+        bool alive = !_deathRegistered();
+        
+        // autokill guard
+        if (alive && _feedingSkipped()) _rip();
         
         return CanaryType.MultipleFeeders;
     }
@@ -244,8 +259,11 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
     }
 
     /// @inheritdoc EIP801
-    function getType() external override returns (CanaryType) {
-        if (_feedingSkipped()) _rip();
+    function getCanaryType() external override returns (CanaryType) {
+        bool alive = !_deathRegistered();
+        
+        // autokill guard
+        if (alive && _feedingSkipped()) _rip();
         
         return CanaryType.MultipleMandatoryFeeders;
     }
