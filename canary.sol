@@ -187,6 +187,15 @@ contract MultipleFeedersCanary is BaseCanary {
         
         _;
     }
+
+    /// @inheritdoc BaseCanary
+    function feed() external override onlyFeeders {
+        _autokillGuard();
+
+        if (!_deathRegistered()) {
+            _timeLastFed = block.timestamp;
+        }
+    }
     
     /// @inheritdoc EIP801
     function getCanaryType() external override returns (CanaryType) {
