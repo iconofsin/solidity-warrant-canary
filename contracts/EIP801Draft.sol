@@ -40,10 +40,6 @@ interface EIP801 {
     function getCanaryBlockOfDeath() external view returns (uint256);
 
 
-    // The following function can be used to track the canary without paying any gas.
-    // It will not automatically pronounce the canary dead, for instance, if it hasn't been fed
-    // on time. As such, it's not a reliable indicator.
-
     /// @notice Returns true if canary is alive, false otherwise. Unlike isCanaryAlive,
     ///         getCanaryType, and getCanaryBlockOfDeath, guards against misrepresenting
     ///         the canary's health by verifying that it has been both fed and not
