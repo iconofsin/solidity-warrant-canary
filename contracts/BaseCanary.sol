@@ -7,10 +7,13 @@ import "./EIP801Draft.sol";
 contract BaseCanary is EIP801 {
     // The block number when the canary died.
     uint256 internal _blockOfDeath;
-    // This is updated every time it's fed.
+    
+    // The timestamp is updated on every feeding.
     uint256 internal _timeLastFed;
+
     // Set in the constructor. Failing to maintain feeding schedule kills the canary.
     uint256 internal _feedingInterval;
+
     // default to
     CanaryType constant private _canaryType = CanaryType.Simple;
 
@@ -59,13 +62,13 @@ contract BaseCanary is EIP801 {
 
     /// @notice Feeds the canary. This must only be accessible to feeder(s).
     /// @dev Override and implement in a derived class.
-    function feed() external virtual onlyFeeders {}
+    function feedCanary() external virtual onlyFeeders {}
     
     
     /// @notice Instantly kills the canary if alive.
     ///         Note that any one feeder can poison the canary for all types.
     ///         Override this method if you need a different behaviour.
-    function poison() external virtual onlyFeeders {
+    function poisonCanary() external virtual onlyFeeders {
         _rip();
     }
 

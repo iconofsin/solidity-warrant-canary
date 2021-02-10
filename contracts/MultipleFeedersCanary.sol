@@ -31,7 +31,7 @@ contract MultipleFeedersCanary is BaseCanary {
     }
 
     /// @inheritdoc BaseCanary
-    function feed() external override onlyFeeders {
+    function feedCanary() external override onlyFeeders {
         _autokillGuard();
 
         if (!_deathRegistered()) {

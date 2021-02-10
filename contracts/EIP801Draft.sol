@@ -42,9 +42,10 @@ interface EIP801 {
 
     /// @notice Returns true if canary is alive, false otherwise. Unlike isCanaryAlive,
     ///         getCanaryType, and getCanaryBlockOfDeath, guards against misrepresenting
-    ///         the canary's health by verifying that it has been both fed and not
-    ///         intentionally poisoned. Consequently, touchCanary is a _transaction_, while
-    ///         the above are _calls_. 
+    ///         the canary's health by verifying that it has been both fed on time and not
+    ///         intentionally poisoned. Consequently, touchCanary is a _transaction_ (costs gas),
+    ///         while the above are _calls_ (free).
+    ///
     function touchCanary() external returns (bool);
 }
 
