@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.1;
 
-import "./BaseCanary.sol"
+import "./BaseCanary.sol";
 
 /// @notice Any one feeder can feed the canary so it keeps on living.
 ///         There must be at least two.
