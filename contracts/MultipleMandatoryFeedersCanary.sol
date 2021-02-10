@@ -7,11 +7,15 @@ import "./BaseCanary.sol";
 ///         There must be at least two. 
 contract MultipleMandatoryFeedersCanary is BaseCanary {
     address[] _feeders;
+
+    // timestamp every feeding by any feeder
     mapping(address => uint256) _feedingLog;
+
     //
     CanaryType constant private _canaryType = CanaryType.MultipleMandatoryFeeders;
 
-
+    /// @param feeders Addresses of the feeders who all must feed the canary.
+    /// @param feedingIntervalInSeconds How often they must do so?
     constructor(address[] memory feeders,
                 uint256 feedingIntervalInSeconds) {
         require(feeders.length > 1, "Need at least two feeders.");

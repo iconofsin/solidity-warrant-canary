@@ -7,9 +7,12 @@ import "./BaseCanary.sol";
 ///         There must be at least two.
 contract MultipleFeedersCanary is BaseCanary {
     mapping(address => uint8) _feeders;
+    
     //
     CanaryType constant private _canaryType = CanaryType.MultipleFeeders;
 
+    /// @param feeders Addresses of the feeders who are allowed to feed the canary.
+    /// @param feedingIntervalInSeconds How often any one of them must do so?
     constructor(address[] memory feeders,
                 uint256 feedingIntervalInSeconds) {
         require(feeders.length > 1, "Need at least 2 feeders.");
