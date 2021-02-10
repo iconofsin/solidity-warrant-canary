@@ -6,7 +6,7 @@ Warrant Canary (or, rather, the death of) can be used for various purposes:
 * To automatically signal a subpoena receipt by an organization from a government agency
 * To automatically signal a person's death
 * To automatically signal any type of malicious event against a collective entity
-* To automatically trigger execution of other code in any of the above event, which
+* To automatically trigger execution of other code in any of the above events, which
   makes it a usable Dead Man's Switch
 
 This repository implements the following

@@ -75,6 +75,13 @@ contract BaseCanary is EIP801 {
         return _timeLastFed + _feedingInterval < block.timestamp;
     }
 
+    /// @notice Kills the canary if it's alive, but the canary wasn't fed on schedule
+    function _autokillGuard() internal {
+        if (!_deathRegistered() && _feedingSkipped()) {
+            _rip();
+        }
+    }
+    
      /// @notice Determines the time remaining before the canary dies
     ///         from hunger.
     /// @return A positive number of seconds if there's still time to feed
@@ -101,11 +108,8 @@ contract BaseCanary is EIP801 {
     //
     /// @inheritdoc EIP801
     function isCanaryAlive() external override returns (bool) {
-        bool alive = !_deathRegistered();
-
-        // autokill guard
-        if (alive && _feedingSkipped()) _rip();
-
+        _autokillGuard();
+        
         return !_deathRegistered();
     }
 
@@ -114,10 +118,7 @@ contract BaseCanary is EIP801 {
 
     /// @inheritdoc EIP801
     function getCanaryBlockOfDeath() external override returns (uint256) {
-        bool alive = !_deathRegistered();
-
-        // autokill guard
-        if (alive && _feedingSkipped()) _rip();
+        _autokillGuard();
         
         return _blockOfDeath;
     }
@@ -146,22 +147,17 @@ contract SingleFeederCanary is BaseCanary {
     }
 
     /// @inheritdoc BaseCanary
-    function feed() external override onlyFeeders  {
-        // are you on time to feed the canary?
-        if (_feedingSkipped()) {
-            // you're too late, perhaps on purpose
-            _rip();
-        } else {
+    function feed() external override onlyFeeders {
+        _autokillGuard();
+
+        if (!_deathRegistered()) {
             _timeLastFed = block.timestamp;
         }
     }
 
     /// @inheritdoc EIP801
     function getCanaryType() external override returns (CanaryType) {
-        bool alive = !_deathRegistered();
-
-        // autokill guard
-        if (alive && _feedingSkipped()) _rip();
+        _autokillGuard();
         
         return CanaryType.SingleFeeder;
     }
@@ -194,10 +190,7 @@ contract MultipleFeedersCanary is BaseCanary {
     
     /// @inheritdoc EIP801
     function getCanaryType() external override returns (CanaryType) {
-        bool alive = !_deathRegistered();
-        
-        // autokill guard
-        if (alive && _feedingSkipped()) _rip();
+        _autokillGuard();
         
         return CanaryType.MultipleFeeders;
     }
@@ -234,12 +227,10 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
 
     /// @inheritdoc BaseCanary
     function feed() external override onlyFeeders {
-        // are you on time to feed the canary?
-        if (_feedingSkipped()) {
-            // you're too late, perhaps on purpose
-            _rip();
-        } else {
-            // okay, YOU have fed the canary...
+        _autokillGuard();
+
+        if (!_deathRegistered()) {
+             // okay, YOU have fed the canary...
             _feedingLog[msg.sender] = block.timestamp;
 
             // ...but how about your pals?
@@ -260,10 +251,7 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
 
     /// @inheritdoc EIP801
     function getCanaryType() external override returns (CanaryType) {
-        bool alive = !_deathRegistered();
-        
-        // autokill guard
-        if (alive && _feedingSkipped()) _rip();
+        _autokillGuard();
         
         return CanaryType.MultipleMandatoryFeeders;
     }
