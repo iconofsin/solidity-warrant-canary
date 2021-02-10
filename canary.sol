@@ -46,6 +46,8 @@ contract BaseCanary is EIP801 {
     uint256 internal _timeLastFed;
     // Set in the constructor. Failing to maintain feeding schedule kills the canary.
     uint256 internal _feedingInterval;
+    // default to
+    CanaryType constant private _canaryType = CanaryType.Simple;
 
     /// @notice Override this in inherited classes, depending on the canary type.
     modifier onlyFeeders() virtual { _; }
@@ -114,7 +116,12 @@ contract BaseCanary is EIP801 {
     }
 
     /// @inheritdoc EIP801
-    function getCanaryType() external override virtual returns (CanaryType) {}
+    function getCanaryType() external override returns (CanaryType) {
+        _autokillGuard();
+                
+        return _canaryType;
+    }
+    
 
     /// @inheritdoc EIP801
     function getCanaryBlockOfDeath() external override returns (uint256) {
@@ -130,6 +137,8 @@ contract SingleFeederCanary is BaseCanary {
     // The owner is the feeder, but with minimal modifications to
     //         the constructor, anyone could be.
     address private _feeder;
+    //
+    CanaryType constant private _canaryType = CanaryType.SingleFeeder;
     
     constructor(uint256 feedingIntervalInSeconds) {
         _feeder = msg.sender;
@@ -154,19 +163,14 @@ contract SingleFeederCanary is BaseCanary {
             _timeLastFed = block.timestamp;
         }
     }
-
-    /// @inheritdoc EIP801
-    function getCanaryType() external override returns (CanaryType) {
-        _autokillGuard();
-        
-        return CanaryType.SingleFeeder;
-    }
 }
 
 /// @notice Any one feeder can feed the canary so it keeps on living.
 ///         There must be at least two.
 contract MultipleFeedersCanary is BaseCanary {
     mapping(address => uint8) _feeders;
+    //
+    CanaryType constant private _canaryType = CanaryType.MultipleFeeders;
 
     constructor(address[] memory feeders,
                 uint256 feedingIntervalInSeconds) {
@@ -196,13 +200,6 @@ contract MultipleFeedersCanary is BaseCanary {
             _timeLastFed = block.timestamp;
         }
     }
-    
-    /// @inheritdoc EIP801
-    function getCanaryType() external override returns (CanaryType) {
-        _autokillGuard();
-        
-        return CanaryType.MultipleFeeders;
-    }
 }
 
 /// @notice Every feeder must feed the canary so it doesn't die.
@@ -210,6 +207,9 @@ contract MultipleFeedersCanary is BaseCanary {
 contract MultipleMandatoryFeedersCanary is BaseCanary {
     address[] _feeders;
     mapping(address => uint256) _feedingLog;
+    //
+    CanaryType constant private _canaryType = CanaryType.MultipleMandatoryFeeders;
+
 
     constructor(address[] memory feeders,
                 uint256 feedingIntervalInSeconds) {
@@ -242,7 +242,7 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
              // okay, YOU have fed the canary...
             _feedingLog[msg.sender] = block.timestamp;
 
-            // ...but how about your pals?
+            // ...but how about your feeder pals?
             bool everyoneHasFedTheCanary = true;
             
             for (uint256 f = 0; f < _feeders.length; f++) {
@@ -258,11 +258,5 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
         }
     }
 
-    /// @inheritdoc EIP801
-    function getCanaryType() external override returns (CanaryType) {
-        _autokillGuard();
-        
-        return CanaryType.MultipleMandatoryFeeders;
-    }
-    
+   
 }
