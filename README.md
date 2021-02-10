@@ -20,4 +20,4 @@ This repository implements the following
 
 NOTE: Checking if a canary is alive might cost gas, but in most scenarios is free.
       For every watched canary, the monitor might be charged at most once iff the
-      canary has died and the RIP even has not yet been emitted through other means.
+      canary has died and the RIPCanary event has not yet been emitted through other means.
