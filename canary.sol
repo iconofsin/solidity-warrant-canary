@@ -190,7 +190,7 @@ contract MultipleFeedersCanary is BaseCanary {
 
 /// @notice Every feeder must feed the canary so it doesn't die.
 ///         There must be at least two. 
-contract MultipleMandatoryFeeders is BaseCanary {
+contract MultipleMandatoryFeedersCanary is BaseCanary {
     address[] _feeders;
     mapping(address => uint256) _feedingLog;
 
