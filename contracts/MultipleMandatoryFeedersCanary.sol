@@ -4,7 +4,13 @@ pragma solidity ^0.8.1;
 import "./BaseCanary.sol";
 
 /// @notice Every feeder must feed the canary so it doesn't die.
-///         There must be at least two. 
+///         There must be at least two.
+/// @dev EIP801 suggests _autokillGuard() (see implementation of feedCanary())
+///      must be called in all contract's functions to guarantee that RIPCanary
+///      is emitted (once) as soon as the canary dies. Because of the way Solidity
+///      differentiates potentially state-changing transactions and state-changing
+///      transactions (it doesn't), this requirement could quickly become costly
+///      in terms of gas spendings.
 contract MultipleMandatoryFeedersCanary is BaseCanary {
     address[] _feeders;
 

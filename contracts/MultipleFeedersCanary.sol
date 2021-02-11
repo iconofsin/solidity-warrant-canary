@@ -5,6 +5,12 @@ import "./BaseCanary.sol";
 
 /// @notice Any one feeder can feed the canary so it keeps on living.
 ///         There must be at least two.
+/// @dev EIP801 suggests _autokillGuard() (see implementation of feedCanary())
+///      must be called in all contract's functions to guarantee that RIPCanary
+///      is emitted (once) as soon as the canary dies. Because of the way Solidity
+///      differentiates potentially state-changing transactions and state-changing
+///      transactions (it doesn't), this requirement could quickly become costly
+///      in terms of gas spendings.
 contract MultipleFeedersCanary is BaseCanary {
     mapping(address => uint8) _feeders;
     
