@@ -3,8 +3,8 @@ pragma solidity ^0.8.1;
 
 import "./EIP801Draft.sol";
 
-/// @notice Implements basic canary logic. Never use this directly. 
-contract BaseCanary is EIP801 {
+/// @notice Implements basic canary logic.
+abstract contract BaseCanary is EIP801Draft {
     // The block number when the canary died.
     uint256 internal _blockOfDeath;
     
@@ -36,7 +36,7 @@ contract BaseCanary is EIP801 {
 
         _blockOfDeath = block.number;
 
-        emit RIPCanary(_blockOfDeath, block.timestamp);
+        emit RIPCanary(address(this), _blockOfDeath, block.timestamp);
     }
 
     /// @notice Determines if the canary must die of hunger right now.
@@ -57,7 +57,7 @@ contract BaseCanary is EIP801 {
     /// @return A positive number of seconds if there's still time to feed
     ///         the canary, a negative number otherwise.
     function timeRemaining() external view onlyFeeders returns (int256) {
-        return int256(_feedingInterval - (block.timestamp - _timeLastFed));
+        return int256(_timeLastFed + _feedingInterval - block.timestamp);
     }
 
     /// @notice Feeds the canary. This must only be accessible to feeder(s).

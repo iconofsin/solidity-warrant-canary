@@ -26,6 +26,7 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
 
         for (uint256 f = 0; f < feeders.length; f++) {
             _feedingLog[feeders[f]] = _timeLastFed;
+            
             _feeders.push(feeders[f]);
         }
 

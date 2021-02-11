@@ -5,12 +5,13 @@ pragma solidity ^0.8.1;
 /// @notice Introduces minor changes compared EIP-801 [https://eips.ethereum.org/EIPS/eip-801]
 ///         Methods have been renamed to avoid potential conflicts with other intefaces
 ///         and contract methods and to increase clarity.
-interface EIP801 {
+interface EIP801Draft {
     /// @notice Triggered when the contract is called for the first time after the canary died.
-    ///         NOTE: EIP-801 had no arguments and named this simply RIP.         
+    ///         NOTE: EIP-801 had no arguments and named this simply RIP.
+    /// @param from The canary contract address.
     /// @param block The block when the canary died.
     /// @param time The time when the canary died.
-    event RIPCanary(uint256 block, uint256 time);
+    event RIPCanary(address indexed from, uint256 block, uint256 time);
 
     /// @notice Types of canaries. Per EIP-801. Unfortunately, EIP-801 does not explain
     ///         what either SingleFeederBadFood or IOT do. 
