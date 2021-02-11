@@ -76,23 +76,23 @@ abstract contract BaseCanary is EIP801Draft {
     //
     // functions for consumption by anyone
     //
-    /// @inheritdoc EIP801
+    /// @inheritdoc EIP801Draft
     function isCanaryAlive() external view override returns (bool) {
         return !_deathRegistered();
     }
 
-    /// @inheritdoc EIP801
+    /// @inheritdoc EIP801Draft
     function getCanaryType() external pure override returns (CanaryType) {
         return _canaryType;
     }
     
 
-    /// @inheritdoc EIP801
+    /// @inheritdoc EIP801Draft
     function getCanaryBlockOfDeath() external view override returns (uint256) {        
         return _blockOfDeath;
     }
 
-    /// @inheritdoc EIP801
+    /// @inheritdoc EIP801Draft
     function touchCanary() external override returns (bool) {
         _autokillGuard();
 
