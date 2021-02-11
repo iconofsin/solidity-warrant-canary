@@ -24,7 +24,9 @@ interface EIP801Draft {
      SingleFeederBadFood,
      MultipleFeeders,
      MultipleMandatoryFeeders,
-     IOT
+     IOT,
+     // Extension: see ResilientCanary
+     Resilient
     }
 
     /// @notice Determines whether the canary was fed properly to signal e.g. that no warrant

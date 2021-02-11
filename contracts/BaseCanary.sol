@@ -30,7 +30,9 @@ abstract contract BaseCanary is EIP801Draft {
     }
 
     /// @notice If the canary is alive, kills it, records the death block, and emits RIP(...)
-    function _rip() internal {
+    /// @dev Do not execute directly. Override if you need to add self-destruct logic in the
+    ///      Client Contract.
+    function _pronounceDead() internal {
         // don't kill the bird twice
         if (_deathRegistered()) return;
 
@@ -48,7 +50,7 @@ abstract contract BaseCanary is EIP801Draft {
     /// @notice Kills the canary if it's alive, but the canary wasn't fed on schedule
     function _autokillGuard() internal {
         if (!_deathRegistered() && _feedingSkipped()) {
-            _rip();
+            _pronounceDead();
         }
     }
     
@@ -69,7 +71,7 @@ abstract contract BaseCanary is EIP801Draft {
     ///         Note that any one feeder can poison the canary for all types.
     ///         Override this method if you need a different behaviour.
     function poisonCanary() external virtual onlyFeeders {
-        _rip();
+        _pronounceDead();
     }
 
    
