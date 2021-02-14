@@ -118,10 +118,7 @@ contract('Feeding I', async accounts => {
         truffleAssert.eventEmitted(tx, 'RIPCanary');
     })
 
-    it('6 - touchCanary is callable by anyone', async () => {
-        await truffleAssert.passes(client.touchCanary({from: accounts[7]}));
-    })
-  
+   
 })
 
 
