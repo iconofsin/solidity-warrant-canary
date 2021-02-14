@@ -1,3 +1,5 @@
 node_modules/
 abis/
 .DS_Store
+test/SingleFeederCanary.t.sol
+SingleFeederCanary.t.sol
