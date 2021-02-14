@@ -15,7 +15,7 @@ abstract contract BaseCanary is EIP801Draft {
     uint256 internal _feedingInterval;
 
     // default to
-    CanaryType constant private _canaryType = CanaryType.Simple;
+    CanaryType internal _canaryType = CanaryType.Simple;
 
     /// @notice Override this in inherited classes, depending on the canary type.
     modifier onlyFeeders() virtual { _; }
@@ -84,7 +84,7 @@ abstract contract BaseCanary is EIP801Draft {
     }
 
     /// @inheritdoc EIP801Draft
-    function getCanaryType() external pure override returns (CanaryType) {
+    function getCanaryType() external view override returns (CanaryType) {
         return _canaryType;
     }
     

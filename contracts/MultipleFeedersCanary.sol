@@ -14,9 +14,6 @@ import "./BaseCanary.sol";
 contract MultipleFeedersCanary is BaseCanary {
     mapping(address => uint8) _feeders;
     
-    //
-    CanaryType constant private _canaryType = CanaryType.MultipleFeeders;
-
     /// @param feeders Addresses of the feeders who are allowed to feed the canary.
     /// @param feedingIntervalInSeconds How often any one of them must do so?
     constructor(address[] memory feeders,
@@ -30,6 +27,8 @@ contract MultipleFeedersCanary is BaseCanary {
         _timeLastFed = block.timestamp;
 
         _feedingInterval = feedingIntervalInSeconds;
+
+        _canaryType = CanaryType.MultipleFeeders;
     }
 
     /// @inheritdoc BaseCanary

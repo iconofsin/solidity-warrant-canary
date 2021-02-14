@@ -15,8 +15,6 @@ contract SingleFeederCanary is BaseCanary {
     // The owner is the feeder, but with minimal modifications to
     //         the constructor, anyone could be.
     address private _feeder;
-    //
-    CanaryType constant private _canaryType = CanaryType.SingleFeeder;
     
     constructor(uint256 feedingIntervalInSeconds) {
         _feeder = msg.sender;
@@ -24,6 +22,8 @@ contract SingleFeederCanary is BaseCanary {
         _timeLastFed = block.timestamp;
 
         _feedingInterval = feedingIntervalInSeconds;
+
+        _canaryType = CanaryType.SingleFeeder;
     }
 
     /// @inheritdoc BaseCanary
@@ -41,4 +41,6 @@ contract SingleFeederCanary is BaseCanary {
             _timeLastFed = block.timestamp;
         }
     }
+
+    
 }

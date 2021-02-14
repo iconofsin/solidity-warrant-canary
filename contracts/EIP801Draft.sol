@@ -35,7 +35,7 @@ interface EIP801Draft {
     function isCanaryAlive() external view returns (bool);
     
     /// @notice Returns the type of the canary. EIP-801 name: getType
-    function getCanaryType() external pure returns (CanaryType);
+    function getCanaryType() external view returns (CanaryType);
 
     /// @notice Returns the block when the canary died. 0 otherwise. THIS IS A CHANGE FROM
     ///         EIP-801, because we can no longer throw in Solidity. EIP-801 name: getBlockOfDeath.

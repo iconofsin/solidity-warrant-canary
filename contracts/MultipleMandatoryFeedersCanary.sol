@@ -18,7 +18,7 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
     mapping(address => uint256) _feedingLog;
 
     //
-    CanaryType constant private _canaryType = CanaryType.MultipleMandatoryFeeders;
+    
 
     /// @param feeders Addresses of the feeders who all must feed the canary.
     /// @param feedingIntervalInSeconds How often they must do so?
@@ -37,6 +37,8 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
         }
 
         _feedingInterval = feedingIntervalInSeconds;
+
+        _canaryType = CanaryType.MultipleMandatoryFeeders;
     }
 
     /// @inheritdoc BaseCanary
