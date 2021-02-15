@@ -24,7 +24,7 @@ contract('Feeding II', async accounts => {
     it('2.2 - Skipped Feeding kills the canary', async () => {
         const blockOfDeath = await client.getCanaryBlockOfDeath.call();
 
-        assert.equal(blockOfDeath.valueOf(), 0);
+        assert.equal(blockOfDeath.toNumber(), 0);
         
         await client.feedCanary();
         
@@ -62,9 +62,9 @@ contract('Poisoning', async accounts => {
         
         await truffleAssert.passes(client.poisonCanary({from: feeder}));
         
-        const isAlive = await client.isCanaryAlive();
+        const isAlive = await client.isCanaryAlive.call();
 
-        assert.isFalse(isAlive);
+        assert.isFalse(isAlive.valueOf());
       })
     
     it('3.1 - When poisoned, the canary is Pronounced Dead', async () => {
@@ -72,11 +72,11 @@ contract('Poisoning', async accounts => {
         
         await client.poisonCanary({from: feeder});
         
-        const isAlive = await client.isCanaryAlive();
+        const isAlive = await client.isCanaryAlive.call();
         const blockOfDeath = await client.getCanaryBlockOfDeath.call();
 
-        assert.isFalse(isAlive);
-        assert.isAbove(blockOfDeath.valueOf().toNumber(), 0);
+        assert.isFalse(isAlive.valueOf());
+        assert.isAbove(blockOfDeath.toNumber(), 0);
       })
 
 })

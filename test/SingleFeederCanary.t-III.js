@@ -12,7 +12,7 @@ function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-contract('Touching', async accounts => {
+contract('Touching I', async accounts => {
 
     let client;
 
@@ -33,5 +33,4 @@ contract('Touching', async accounts => {
 
         truffleAssert.eventEmitted(tx, 'RIPCanary');
     })
-
 })

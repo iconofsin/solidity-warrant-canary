@@ -30,29 +30,29 @@ contract('Client Basics', async accounts => {
     it('1.2 - Time last fed is set to block.timestamp', async () => {
         const timeLastFed = await client.getTimeLastFed.call();
 
-        await timeout(2000);
+        //await timeout(2000);
         
         const block = await web3.eth.getBlock("latest");
 
-        assert.isAtLeast(timeLastFed.valueOf() - block.timestamp, 0);
+        assert.isAtLeast(block.timestamp - timeLastFed.toNumber(), 0);
     })
 
     it('1.3 - Should have zero initial Block of Death', async () => {
         const initialBlockOfDeath = await client.getCanaryBlockOfDeath.call();
         
-        assert.equal(initialBlockOfDeath.valueOf(), 0);
+        assert.equal(initialBlockOfDeath.toNumber(), 0);
     })
 
     it('1.4 - Feeding interval must be 86400 seconds', async () => {
         const feedingInterval = await client.getFeedingInterval.call();
         
-        assert.equal(feedingInterval.valueOf(), 86400);
+        assert.equal(feedingInterval.toNumber(), 86400);
     })
     
     it('1.5 - The canary is initially alive', async () => {
-        const isAlive = await client.isCanaryAlive();
+        const isAlive = await client.isCanaryAlive.call();
 
-        assert.isTrue(isAlive);
+        assert.isTrue(isAlive.valueOf());
     })
 
     it('1.6 - Should be of type SingleFeeder', async () => {
@@ -80,7 +80,7 @@ contract('Feeding I', async accounts => {
     it('2.0 - Feeding interval must be 10 seconds', async () => {
         const feedingInterval = await client.getFeedingInterval.call();
 
-        assert.equal(feedingInterval.valueOf(), 10);
+        assert.equal(feedingInterval.toNumber(), 10);
     })
 
     it('2.x - Only the feeder can feed the canary', async () => {
@@ -103,7 +103,8 @@ contract('Feeding I', async accounts => {
 
         const feedingTimestamp2 = await client.getTimeLastFed.call();
 
-        assert.isAbove(feedingTimestamp2.valueOf() - feedingTimestamp1.valueOf(), 0);
+        assert.isAbove(feedingTimestamp2.toNumber() -
+                       feedingTimestamp1.toNumber(), 0);
     })
 
 

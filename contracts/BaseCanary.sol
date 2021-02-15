@@ -41,13 +41,16 @@ abstract contract BaseCanary is EIP801Draft {
         emit RIPCanary(address(this), _blockOfDeath, block.timestamp);
     }
 
+    function setDeathAction(function() internal callback) internal {
+    }
+
     /// @notice Determines if the canary must die of hunger right now.
     /// @return True if it's as good as dead, false otherwise.
     function _feedingSkipped() internal view returns (bool) {
         return _timeLastFed + _feedingInterval < block.timestamp;
     }
 
-    /// @notice Kills the canary if it's alive, but the canary wasn't fed on schedule
+    /// @notice Kills the canary if it's "alive", but wasn't fed on schedule
     function _autokillGuard() internal {
         if (!_deathRegistered() && _feedingSkipped()) {
             _pronounceDead();
