@@ -16,14 +16,9 @@ contract SingleFeederCanary is BaseCanary {
     //         the constructor, anyone could be.
     address private _feeder;
     
-    constructor(uint256 feedingIntervalInSeconds) {
+    constructor(uint256 feedingIntervalInSeconds)
+        BaseCanary(feedingIntervalInSeconds, CanaryType.SingleFeeder) {
         _feeder = msg.sender;
-        
-        _timeLastFed = block.timestamp;
-
-        _feedingInterval = feedingIntervalInSeconds;
-
-        _canaryType = CanaryType.SingleFeeder;
     }
 
     /// @inheritdoc BaseCanary
@@ -34,12 +29,8 @@ contract SingleFeederCanary is BaseCanary {
     }
 
     /// @inheritdoc BaseCanary
-    function feedCanary() external override onlyFeeders {
-        _autokillGuard();
-
-        if (!_deathRegistered()) {
-            _timeLastFed = block.timestamp;
-        }
+    function feedCanary() public override onlyFeeders canaryGuard {
+        timeLastFed = block.timestamp;
     }
 
     

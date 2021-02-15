@@ -12,7 +12,7 @@ import "./BaseCanary.sol";
 ///      transactions (it doesn't), this requirement could quickly become costly
 ///      in terms of gas spendings.
 contract MultipleMandatoryFeedersCanary is BaseCanary {
-    address[] _feeders;
+    address[] private _feeders;
 
     // timestamp every feeding by any feeder
     mapping(address => uint256) _feedingLog;
@@ -23,22 +23,18 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
     /// @param feeders Addresses of the feeders who all must feed the canary.
     /// @param feedingIntervalInSeconds How often they must do so?
     constructor(address[] memory feeders,
-                uint256 feedingIntervalInSeconds) {
+                uint256 feedingIntervalInSeconds)
+        BaseCanary(feedingIntervalInSeconds, CanaryType.MultipleMandatoryFeeders) {
+        
         require(feeders.length > 1, "Need at least two feeders.");
         
         _feeders = new address[](feeders.length);
         
-        _timeLastFed = block.timestamp;
-
         for (uint256 f = 0; f < feeders.length; f++) {
-            _feedingLog[feeders[f]] = _timeLastFed;
+            _feedingLog[feeders[f]] = timeLastFed;
             
             _feeders.push(feeders[f]);
         }
-
-        _feedingInterval = feedingIntervalInSeconds;
-
-        _canaryType = CanaryType.MultipleMandatoryFeeders;
     }
 
     /// @inheritdoc BaseCanary
@@ -49,26 +45,22 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
     }
 
     /// @inheritdoc BaseCanary
-    function feedCanary() external override onlyFeeders {
-        _autokillGuard();
+    function feedCanary() public override onlyFeeders canaryGuard {
+        // okay, YOU have fed the canary...
+        _feedingLog[msg.sender] = block.timestamp;
 
-        if (!_deathRegistered()) {
-             // okay, YOU have fed the canary...
-            _feedingLog[msg.sender] = block.timestamp;
-
-            // ...but how about your feeder pals?
-            bool everyoneHasFedTheCanary = true;
-            
-            for (uint256 f = 0; f < _feeders.length; f++) {
-                everyoneHasFedTheCanary =
-                    everyoneHasFedTheCanary &&
-                    (_timeLastFed + _feedingInterval
-                     <=
-                     _feedingLog[_feeders[f]]);
-            }
-
-            if (everyoneHasFedTheCanary)
-                _timeLastFed = block.timestamp;
+        // ...but how about your feeder pals?
+        bool everyoneHasFedTheCanary = true;
+        
+        for (uint256 f = 0; f < _feeders.length; f++) {
+            everyoneHasFedTheCanary =
+                everyoneHasFedTheCanary &&
+                (timeLastFed + feedingInterval
+                 <=
+                 _feedingLog[_feeders[f]]);
         }
+        
+        if (everyoneHasFedTheCanary)
+            timeLastFed = block.timestamp;
     }
 }

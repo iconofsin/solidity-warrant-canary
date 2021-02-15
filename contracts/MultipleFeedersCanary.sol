@@ -12,23 +12,19 @@ import "./BaseCanary.sol";
 ///      transactions (it doesn't), this requirement could quickly become costly
 ///      in terms of gas spendings.
 contract MultipleFeedersCanary is BaseCanary {
-    mapping(address => uint8) _feeders;
+    mapping(address => uint8) private _feeders;
     
     /// @param feeders Addresses of the feeders who are allowed to feed the canary.
     /// @param feedingIntervalInSeconds How often any one of them must do so?
     constructor(address[] memory feeders,
-                uint256 feedingIntervalInSeconds) {
+                uint256 feedingIntervalInSeconds)
+        BaseCanary(feedingIntervalInSeconds, CanaryType.MultipleFeeders) {
+        
         require(feeders.length > 1, "Need at least 2 feeders.");
         
         for (uint256 f = 0; f < feeders.length; f++) {
             _feeders[feeders[f]] = 1;
         }
-        
-        _timeLastFed = block.timestamp;
-
-        _feedingInterval = feedingIntervalInSeconds;
-
-        _canaryType = CanaryType.MultipleFeeders;
     }
 
     /// @inheritdoc BaseCanary
@@ -39,11 +35,7 @@ contract MultipleFeedersCanary is BaseCanary {
     }
 
     /// @inheritdoc BaseCanary
-    function feedCanary() external override onlyFeeders {
-        _autokillGuard();
-
-        if (!_deathRegistered()) {
-            _timeLastFed = block.timestamp;
-        }
+    function feedCanary() public override onlyFeeders canaryGuard {
+        timeLastFed = block.timestamp;
     }
 }
