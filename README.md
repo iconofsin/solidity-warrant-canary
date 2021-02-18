@@ -41,7 +41,7 @@ This repository currently includes the following:
 * MultipleMandatoryFeedersCanary (Solidity)
 * Test Suite for SingleFeederCanary (truffle/truffle-assert/JavaScript)
 
-== CONCEPTS ==
+## CONCEPTS
 A canary is a signaling mechanism. In a perfect world, verifying its state of health would be unambiguous and free. In reality, however, Ethereum, because of the EVM isolation, requires external input and oftentimes gas fees to retrieve any kind of information.
 
 Consequently, the implementations offered here include functions that could misrepresent the canary's state of health gas-free as well as functions that are guaranteed to report it accurately at an expense.
@@ -62,12 +62,12 @@ A standard approach is to
 1) Use guard modifiers for every contract functions that implements the contract's business logic. Guards check whether feeding was skipped and pronounce the canary dead if it was. This results in the contract becoming unusable if the canary dies.
 2) Make provisions in the contract code for the event of the canary dying. You might want, for example, to transfer assets to a different account that hasn't been compromised or... do nothing if that's acceptable in terms of future interactions of the contract's owner and their audience. In a more complicated scenario, another contract could be called.
 
-== TYPES OF CANARIES ==
+## TYPES OF CANARIES
 _Single Feeder_ - one account must feed the canary.
 
 _Multiple Feeders_ - multiple accounts are allowed to feed the canary, but it's enough if any one of them does.
 
 _Multiple Mandatory Feeders_ - multiple accounts must all feed the canary.
 
-=== Donations === 
+## Donations 
 If you find this implementation of Warrant Canary useful, consider donating Ξ to 0xB8E6F89556c3Dc4d38C2251500F9e314039034D3.
