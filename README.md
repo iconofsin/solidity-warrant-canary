@@ -1,4 +1,4 @@
-* An implementation of Warrant Canary for Ethereum.*
+**An implementation of Warrant Canary for Ethereum.**
 
 Conceptual prerequisites:
 - https://en.wikipedia.org/wiki/Warrant_canary
