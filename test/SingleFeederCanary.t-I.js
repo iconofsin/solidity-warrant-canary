@@ -3,6 +3,8 @@ const SingleFeederHungryCanaryClientExample = artifacts.require('SingleFeederHun
 const EIP801Draft = artifacts.require('EIP801Draft');
 
 const truffleAssert = require('truffle-assertions');
+const exceptions = require('./exceptions.js')
+
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -66,10 +68,10 @@ contract('Client Basics', async accounts => {
 
 contract('Feeding I', async accounts => {
 
-    let client;
+    let client1;
 
     beforeEach('setup contract for each test case', async () => {
-        client = await SingleFeederHungryCanaryClientExample.deployed();
+        client1 = await SingleFeederHungryCanaryClientExample.deployed();
     })
     
     // 2. Only the contract owner ({_feeder}) can feed the canary (feedCanary())
@@ -78,7 +80,7 @@ contract('Feeding I', async accounts => {
     //     the canary is automatically Pronounced Dead, the feeding is canceled and no longer
     //     possible.
     it('2.0 - Feeding interval must be 10 seconds', async () => {
-        const feedingInterval = await client.getFeedingInterval.call();
+        const feedingInterval = await client1.getFeedingInterval.call();
 
         assert.equal(feedingInterval.toNumber(), 10);
     })
@@ -87,21 +89,21 @@ contract('Feeding I', async accounts => {
         const nonFeeder = accounts[1];
         const feeder = accounts[0];
 
-        await truffleAssert.reverts(client.feedCanary({from: nonFeeder}),
+        await truffleAssert.reverts(client1.feedCanary({from: nonFeeder}),
                                     "You're not the feeder.");
 
-        await truffleAssert.passes(client.feedCanary({from: feeder}));
+        await truffleAssert.passes(client1.feedCanary({from: feeder}));
     })
 
 
     it('2.1 - Feeding updates Time Last Fed', async () => {
-        const feedingTimestamp1 = await client.getTimeLastFed.call();
+        const feedingTimestamp1 = await client1.getTimeLastFed.call();
 
         await timeout(5000);
 
-        await client.feedCanary();
+        await client1.feedCanary();
 
-        const feedingTimestamp2 = await client.getTimeLastFed.call();
+        const feedingTimestamp2 = await client1.getTimeLastFed.call();
 
         assert.isAbove(feedingTimestamp2.toNumber() -
                        feedingTimestamp1.toNumber(), 0);
@@ -110,18 +112,29 @@ contract('Feeding I', async accounts => {
 
     // because RIPCanary is emitted only once, this test must precede 2.2
     it('2.2a - Killing the canary emits RIPCanary', async () => {
-        await client.feedCanary();
+        await client1.feedCanary();
 
         await timeout(12000);
 
-        const tx = await client.feedCanary();
+        let tx
+
+        // try {
+        //     tx = await client1.feedCanary(); 
+        // }
+        // catch (error) {
+        //     assert(error, "Expected an error but did not get one");
+        //     assert(error.message.startsWith("VM Exception while processing transaction: " + message),
+        //            "Expected an error starting with '" +
+        //            "VM Exception while processing transaction: " +
+        //            message + "' but got '" + error.message + "' instead");
+        // }
+
+        tx = await exceptions.catchRevert(client1.feedCanary());
+        
 
         truffleAssert.eventEmitted(tx, 'RIPCanary');
     })
-
    
 })
-
-
 
                        

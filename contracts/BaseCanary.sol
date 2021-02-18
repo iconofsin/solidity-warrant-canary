@@ -19,12 +19,6 @@ abstract contract BaseCanary is EIP801Draft {
     }
     
     //
-    // -EXTERNAL-
-    //
-
-    
-
-    //
     // -PUBLIC-
     //
     
@@ -65,7 +59,7 @@ abstract contract BaseCanary is EIP801Draft {
     //
     // -INTERNAL-
     //
-     /// @notice If the canary is alive, kills it, records the death block, and emits RIP(...)
+    /// @notice If the canary is alive, kills it, records the death block, and emits RIP(...)
     /// @dev Do not execute directly. Override if you need to add self-destruct logic in the
     ///      Client Contract.
     function pronounceDead() internal {
@@ -83,12 +77,11 @@ abstract contract BaseCanary is EIP801Draft {
 
     /// @notice Kills the canary if it's "alive", but wasn't fed on schedule
     function killCanaryIfFeedingSkipped() internal {
-        if (feedingSkipped() && isCanaryAlive()) {
+        if (feedingSkipped()) {
             pronounceDead();
         }
     }
-
-
+    
     /// @notice Override this in inherited classes, depending on the canary type.
     modifier onlyFeeders() virtual {
         require(false, "You must override onlyFeeders.");
@@ -99,7 +92,8 @@ abstract contract BaseCanary is EIP801Draft {
     modifier canaryGuard {
         killCanaryIfFeedingSkipped();
 
-        require(isCanaryAlive(), "The canary has died.");
+        if (!isCanaryAlive()) return;
+        //require(isCanaryAlive(), "The canary has died.");
         
         _;
     }
