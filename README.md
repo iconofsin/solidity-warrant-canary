@@ -50,7 +50,7 @@ Examine the basic scenario of a canary that needs to be fed every day, or once e
 
 If a feeding is skipped, the canary is reported as alive if gas-free pure/view functions are used (`isCanaryAlive()`, `getCanaryBlockOfDeath()`). Formally, however, the canary is dead.
 
-In this scenario, whoever calls `touchCanary()` or any other function guarded with the `canaryGuard` modifier first will incur gas fees, but will also cause the canary to be Pronounced Dead.
+In this scenario, whoever calls `touchCanary()` or any function guarded with the `canaryGuard` modifier first will incur gas fees, but will also cause the canary to be Pronounced Dead.
 
 *Pronouncing Dead*. RIPCanary is emitted, block of death is set, and from this point forward `isCanaryAlive()` *always* returns `false`.
 
