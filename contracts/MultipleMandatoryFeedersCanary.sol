@@ -45,7 +45,7 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
     }
 
     /// @inheritdoc BaseCanary
-    function feedCanary() public override onlyFeeders canaryGuard {
+    function feedCanary() public override canaryGuard onlyFeeders {
         // okay, YOU have fed the canary...
         _feedingLog[msg.sender] = block.timestamp;
 
