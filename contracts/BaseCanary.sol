@@ -10,6 +10,10 @@ abstract contract BaseCanary is EIP801ModifiedDraft {
     
     constructor(uint256 feedingIntervalInSeconds,
                 CanaryType canaryTypeValue) {
+        // let's try to keep this under 10 years to avoid overflow issues
+        require(feedingIntervalInSeconds < 315360000, "The feeding interval must be under 10 years.");
+        // and also, don't shoot yourself in the foot, guys
+        require(feedingIntervalInSeconds >= 3600, "The feeding interval must be at least 1 hour.");
         
         feedingInterval = feedingIntervalInSeconds;
 
