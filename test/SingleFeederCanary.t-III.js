@@ -1,4 +1,3 @@
-const SingleFeederCanaryClientExample = artifacts.require('SingleFeederCanaryClientExample');
 const SingleFeederHungryCanaryClientExample = artifacts.require('SingleFeederHungryCanaryClientExample');
 const EIP801Draft = artifacts.require('EIP801ModifiedDraft');
 
