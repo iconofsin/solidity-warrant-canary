@@ -21,7 +21,6 @@ contract('Poisoned and Aware', async accounts => {
     
     it(' - poisonCanary() performs the custom action and emits IAmDead()', async () => {
         const tx = await client.poisonCanary();
-        //console.log(tx);
 
         truffleAssert.eventEmitted(tx, 'RIPCanary');
         truffleAssert.eventEmitted(tx, 'IAmDead');
