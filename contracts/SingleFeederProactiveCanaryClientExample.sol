@@ -11,14 +11,22 @@ import "./BaseCanary.sol";
 ///      differentiates potentially state-changing transactions and state-changing
 ///      transactions (it doesn't), this requirement could quickly become costly
 ///      in terms of gas spendings.
-contract SingleFeederCanary is BaseCanary {
+contract SingleFeederProactiveCanaryClientExample is BaseCanary {
     // The owner is the feeder, but with minimal modifications to
     //         the constructor, anyone could be.
     address private _feeder;
+
+    event IAmDead();
+    
+    function onDeath() internal {
+        emit IAmDead();
+    }
     
     constructor(uint256 feedingIntervalInSeconds)
         BaseCanary(feedingIntervalInSeconds, CanaryType.SingleFeeder) {
         _feeder = msg.sender;
+        feedingInterval = 10;
+        setActionToExecuteOnDeath(onDeath);
     }
 
     /// @inheritdoc BaseCanary

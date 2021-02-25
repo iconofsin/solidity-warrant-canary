@@ -1,6 +1,6 @@
 const SingleFeederCanaryClientExample = artifacts.require('SingleFeederCanaryClientExample');
 const SingleFeederHungryCanaryClientExample = artifacts.require('SingleFeederHungryCanaryClientExample');
-const EIP801Draft = artifacts.require('EIP801Draft');
+const EIP801Draft = artifacts.require('EIP801ModifiedDraft');
 const exceptions = require('./exceptions.js');
 const truffleAssert = require('truffle-assertions');
 
