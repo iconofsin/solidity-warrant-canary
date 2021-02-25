@@ -2,11 +2,11 @@
 pragma solidity ^0.8.1;
 
 
-import "./EIP801Draft.sol";
+import "./EIP801ModifiedDraft.sol";
 
 
 /// @notice Implements basic canary logic.
-abstract contract BaseCanary is EIP801Draft {
+abstract contract BaseCanary is EIP801ModifiedDraft {
     
     constructor(uint256 feedingIntervalInSeconds,
                 CanaryType canaryTypeValue) {
@@ -24,7 +24,7 @@ abstract contract BaseCanary is EIP801Draft {
     // -PUBLIC-
     //
     
-    /// @inheritdoc EIP801Draft
+    /// @inheritdoc EIP801ModifiedDraft
     function isCanaryAlive() public view override returns (bool) {
         return (blockOfDeath == 0);
     }
@@ -41,17 +41,17 @@ abstract contract BaseCanary is EIP801Draft {
         pronounceDead();
     }
 
-    /// @inheritdoc EIP801Draft
+    /// @inheritdoc EIP801ModifiedDraft
     function getCanaryType() public view override returns (CanaryType) {
         return canaryType;
     }
     
-    /// @inheritdoc EIP801Draft
+    /// @inheritdoc EIP801ModifiedDraft
     function getCanaryBlockOfDeath() public view override returns (uint256) {        
         return blockOfDeath;
     }
 
-    /// @inheritdoc EIP801Draft
+    /// @inheritdoc EIP801ModifiedDraft
     function touchCanary() public override returns (bool alive) {
         if (feedingSkipped()) {
             pronounceDead();
