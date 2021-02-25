@@ -56,11 +56,15 @@ In this scenario, whoever calls `touchCanary()` or any other function guarded wi
 
 Trying to feed a canary pronounced dead does not change its state. The rationale for this is 1) the nature of a warrant canary says it must be so; 2) it's impossible to verify whether the danger has passed or the feeder is being forced against their will.
 
+Beyond the point of death, all functions guarded with `canaryGuard` will revert with a message ("The canary has died.")
+
 Contracts implementing canary interfaces must therefore be prepared to become unusable when the canary dies for whatever reason.
 
 A standard approach is to
 1) Use guard modifiers for every contract functions that implements the contract's business logic. Guards check whether feeding was skipped and pronounce the canary dead if it was. This results in the contract becoming unusable if the canary dies.
 2) Make provisions in the contract code for the event of the canary dying. You might want, for example, to transfer assets to a different account that hasn't been compromised or... do nothing if that's acceptable in terms of future interactions of the contract's owner and their audience. In a more complicated scenario, another contract could be called.
+
+To perform a custom action when the canary dies, set it by calling `setActionToExecuteOnDeath` after the contract is deployed. This function takes as its only argument a function that is to be executed when the canary is pronounced dead (right before `RIPCanary` is emitted.)
 
 ## TYPES OF CANARIES
 _Single Feeder_ - one account must feed the canary.
