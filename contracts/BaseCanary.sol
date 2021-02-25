@@ -16,6 +16,8 @@ abstract contract BaseCanary is EIP801Draft {
         canaryType = canaryTypeValue;
         
         timeLastFed = block.timestamp;
+
+        feedBefore = timeLastFed + feedingInterval;
     }
     
     //
@@ -50,15 +52,27 @@ abstract contract BaseCanary is EIP801Draft {
     }
 
     /// @inheritdoc EIP801Draft
-    function touchCanary() public override returns (bool) {
-        killCanaryIfFeedingSkipped();
-        
-        return isCanaryAlive();
+    function touchCanary() public override returns (bool alive) {
+        if (feedingSkipped()) {
+            pronounceDead();
+            
+            alive = false;
+        } else {
+            alive = isCanaryAlive();
+        }
     }    
     
     //
     // -INTERNAL-
     //
+
+    // @dev You must call this from feedCanary if the feeding was successful. Only call under onlyOwner modifier.
+    function confirmFeeding() internal {
+        feedBefore = block.timestamp + feedingInterval;
+        
+        timeLastFed = block.timestamp;
+    }
+
     /// @notice If the canary is alive, kills it, records the death block, and emits RIP(...)
     /// @dev Do not execute directly. Override if you need to add self-destruct logic in the
     ///      Client Contract.
@@ -68,20 +82,13 @@ abstract contract BaseCanary is EIP801Draft {
 
         blockOfDeath = block.number;
 
+        emit RIPCanary(msg.sender, blockOfDeath, block.timestamp);
+
         if (fnToExecuteOnDeath != UNINITIALIZED_CALLBACK_FN) {
             fnToExecuteOnDeath();
         }
-
-        emit RIPCanary(address(this), blockOfDeath, block.timestamp);
     }
 
-    /// @notice Kills the canary if it's "alive", but wasn't fed on schedule
-    function killCanaryIfFeedingSkipped() internal {
-        if (feedingSkipped()) {
-            pronounceDead();
-        }
-    }
-    
     /// @notice Override this in inherited classes, depending on the canary type.
     modifier onlyFeeders() virtual {
         require(false, "You must override onlyFeeders.");
@@ -90,18 +97,20 @@ abstract contract BaseCanary is EIP801Draft {
     }
 
     modifier canaryGuard {
-        killCanaryIfFeedingSkipped();
-
-        if (!isCanaryAlive()) return;
-        //require(isCanaryAlive(), "The canary has died.");
+        require(isCanaryAlive(), "The canary has died.");
         
-        _;
+        if (feedingSkipped()) {
+            pronounceDead();
+        } else {
+            _;
+        }
     }
     
     // The block number when the canary died.
     uint256 internal blockOfDeath;
     
-    // The timestamp is updated on every feeding.
+    // The timestamps are updated on every feeding.
+    uint256 internal feedBefore;
     uint256 internal timeLastFed;
 
     // Set in the constructor. Failing to maintain feeding schedule kills the canary.
@@ -131,6 +140,6 @@ abstract contract BaseCanary is EIP801Draft {
     /// @notice Determines if the canary must die of hunger right now.
     /// @return True if it's as good as dead, false otherwise.
     function feedingSkipped() private view returns (bool) {
-        return timeLastFed + feedingInterval < block.timestamp;
+        return feedBefore < block.timestamp;
     }
 }

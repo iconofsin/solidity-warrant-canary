@@ -1,19 +1,25 @@
 // adjusted from
 // https://ethereum.stackexchange.com/questions/48627/how-to-catch-revert-error-in-truffle-test-javascript/48629
 const PREFIX = "VM Exception while processing transaction: ";
+const ALTPREFIX = "Returned error: " + PREFIX;
 
 async function tryCatch(promise, message) {
     let tx
     
     try {
         tx = await promise;
+        throw null;
     }
     catch (error) {
-        assert(error, "Expected an error but did not get one");
-        assert(error.message.startsWith(PREFIX + message), "Expected an error starting with '" + PREFIX + message + "' but got '" + error.message + "' instead");
+        assert(error, "Expected an error but did not get one.");
+        assert(error.message.startsWith(PREFIX + message) ||
+               error.message.startsWith(ALTPREFIX + message),
+               "Expected an error starting with '" + PREFIX + message +
+               "' but got '" + error.message + "' instead");
     }
-
-    return tx;
+    finally {
+        return tx
+    }
 };
 
 module.exports = {

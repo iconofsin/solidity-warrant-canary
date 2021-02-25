@@ -1,7 +1,7 @@
 const SingleFeederCanaryClientExample = artifacts.require('SingleFeederCanaryClientExample');
 const SingleFeederHungryCanaryClientExample = artifacts.require('SingleFeederHungryCanaryClientExample');
 const EIP801Draft = artifacts.require('EIP801Draft');
-
+const exceptions = require('./exceptions.js');
 const truffleAssert = require('truffle-assertions');
 
 require('chai')
@@ -14,7 +14,6 @@ function timeout(ms) {
 
 
 contract('Feeding II', async accounts => {
-
     let client;
 
     beforeEach('setup contract for each test case', async () => {
@@ -34,7 +33,7 @@ contract('Feeding II', async accounts => {
         
         await timeout(11000);
         
-        await client.feedCanary();
+        await exceptions.catchRevert(client.feedCanary());
 
         isAlive = await client.isCanaryAlive();
         

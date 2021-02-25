@@ -110,31 +110,23 @@ contract('Feeding I', async accounts => {
     })
 
 
-    // because RIPCanary is emitted only once, this test must precede 2.2
-    it('2.2a - Killing the canary emits RIPCanary', async () => {
+    // 
+    it('2.2a - Guard emits RIPCanary and short-circuits execution forever', async () => {
         await client1.feedCanary();
 
         await timeout(12000);
 
-        let tx
-
-        // try {
-        //     tx = await client1.feedCanary(); 
-        // }
-        // catch (error) {
-        //     assert(error, "Expected an error but did not get one");
-        //     assert(error.message.startsWith("VM Exception while processing transaction: " + message),
-        //            "Expected an error starting with '" +
-        //            "VM Exception while processing transaction: " +
-        //            message + "' but got '" + error.message + "' instead");
-        // }
-
-        tx = await exceptions.catchRevert(client1.feedCanary());
-        
+        const tx = await client1.feedCanary();
 
         truffleAssert.eventEmitted(tx, 'RIPCanary');
+
+        await truffleAssert.reverts(
+            client1.feedCanary(),
+         "The canary has died.");
+
+        
     })
-   
+
 })
 
                        

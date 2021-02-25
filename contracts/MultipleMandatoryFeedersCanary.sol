@@ -61,6 +61,6 @@ contract MultipleMandatoryFeedersCanary is BaseCanary {
         }
         
         if (everyoneHasFedTheCanary)
-            timeLastFed = block.timestamp;
+            confirmFeeding();
     }
 }

@@ -29,8 +29,8 @@ contract SingleFeederCanary is BaseCanary {
     }
 
     /// @inheritdoc BaseCanary
-    function feedCanary() public override onlyFeeders canaryGuard {
-        timeLastFed = block.timestamp;
+    function feedCanary() public override canaryGuard onlyFeeders {
+        confirmFeeding();
     }
 
     

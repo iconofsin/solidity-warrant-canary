@@ -36,6 +36,6 @@ contract MultipleFeedersCanary is BaseCanary {
 
     /// @inheritdoc BaseCanary
     function feedCanary() public override onlyFeeders canaryGuard {
-        timeLastFed = block.timestamp;
+        confirmFeeding();
     }
 }
