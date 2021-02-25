@@ -42,7 +42,7 @@ This repository currently includes the following:
 * Test Suite for SingleFeederCanary (truffle/truffle-assert/JavaScript)
 
 ## CONCEPTS
-A canary is a signaling mechanism. In a perfect world, verifying its state of health would be unambiguous and free. In reality, however, Ethereum, because of the EVM isolation, requires external input and oftentimes gas fees to retrieve any kind of information.
+A canary is a signaling mechanism. In a perfect world, verifying its state of health would be unambiguous and free. In reality, however, Ethereum EVM's isolation requires external input and oftentimes gas fees to retrieve any kind of information.
 
 Consequently, the implementations offered here include functions that could misrepresent the canary's state of health gas-free as well as functions that are guaranteed to report it accurately at an expense.
 
